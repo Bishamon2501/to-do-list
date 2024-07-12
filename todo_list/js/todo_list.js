@@ -20,18 +20,22 @@ function switchInput(className, textareaClassName) {
 
 // Function to add to-do
 $(document).ready(() => {
-  $("#todoForm").on("submit", function (e) {
+  $(document).on("submit", "#todoForm", function (e) {
     e.preventDefault();
 
-    let formData = $(this).serialize();
+    let todo = $("#todo");
+    let comment = $("#comment");
 
     $.ajax({
       type: "POST",
       url: "../todo_list/actions/addTodo.php",
-      data: formData,
+      data: {
+        todo: todo.val(),
+        comment: comment.val(),
+      },
       success: function (response) {
         // Update table data after insert
-        window.location.reload();
+        $(".table").load(location.href + " .table");
       },
       error: function (xhr, status, error) {
         console.error("Error:", error);
@@ -45,7 +49,7 @@ $(document).ready(() => {
   switchInput("commentInput", "commentTextarea");
 
   // Function to update to-do
-  $(".updateTodoBtn").on("click", function () {
+  $(document).on("click", ".updateTodoBtn", function () {
     let row = $(this).closest("tr");
     let id = row.data("id");
     let todoInput = row.find(".todoInput");
@@ -61,9 +65,7 @@ $(document).ready(() => {
       },
       success: function (response) {
         // Update table data after update
-        // old version doesn't work properly after AJAX call
-        // $(".table").load(location.href + " .table");
-        window.location.reload();
+        $(".table").load(location.href + " .table");
       },
       error: function (xhr, status, error) {
         console.error("Error:", error);
@@ -72,7 +74,7 @@ $(document).ready(() => {
   });
 
   // Function to delete to-do
-  $(".deleteTodoBtn").on("click", function () {
+  $(document).on("click", ".deleteTodoBtn", function () {
     let row = $(this).closest("tr");
     let id = row.data("id");
 
@@ -84,7 +86,9 @@ $(document).ready(() => {
       },
       success: function (response) {
         // Update table data after delete
-        window.location.reload();
+        setTimeout(() => {
+          $(".table").load(location.href + " .table");
+        }, 1000);
       },
       error: function (xhr, status, error) {
         console.error("Error:", error);
